@@ -15,8 +15,10 @@ class QuantumEspresso(CMakePackage, Package):
     """
 
     homepage = "https://quantum-espresso.org"
-    url = "https://gitlab.com/QEF/q-e/-/archive/qe-6.6/q-e-qe-6.6.tar.gz"
-    git = "https://gitlab.com/QEF/q-e.git"
+    #url = "https://gitlab.com/QEF/q-e/-/archive/qe-6.6/q-e-qe-6.6.tar.gz"
+    #git = "https://gitlab.com/QEF/q-e.git"
+    url = "https://gitlab.com/hjjvandam/q-e/-/archive/fix_include_libqecouple/q-e-fix_include_libqecouple.tar.gz"
+    git = "https://gitlab.com/hjjvandam/q-e.git"
 
     maintainers("ye-luo", "bellenlau", "tgorni")
 
@@ -24,6 +26,11 @@ class QuantumEspresso(CMakePackage, Package):
 
     license("GPL-2.0-only")
 
+    version("libqecouple",
+        #branch="fix_include_libqecouple",
+        url="https://gitlab.com/hjjvandam/q-e/-/archive/fix_include_libqecouple/q-e-fix_include_libqecouple.tar.gz",
+        sha256="5c17ced3eb12f4c0170b1d77884f6ffe8a5af5d8c00ef989f1f3795a446c9d84",
+    )
     version("develop", branch="develop")
     version("7.4", sha256="b15dcfe25f4fbf15ccd34c1194021e90996393478226e601d876f7dea481d104")
     version("7.3.1", sha256="2c58b8fadfe4177de5a8b69eba447db5e623420b070dea6fd26c1533b081d844")
@@ -239,6 +246,12 @@ class QuantumEspresso(CMakePackage, Package):
         "gipaw",
         default=False,
         description="Builds Gauge-Including Projector Augmented-Waves executable",
+    )
+
+    variant(
+        "couple",
+        default=False,
+        description="Build QE library for coupling with LAMMPS in QM/MM functionality",
     )
 
     # Dependencies not affected by variants
@@ -682,6 +695,9 @@ class GenericBuilder(spack.build_systems.generic.GenericBuilder):
 
         if "+gipaw" in spec:
             make("gipaw", parallel=False)
+
+        if "+couple" in spec:
+            make("couple", parallel=False)
 
         if "+environ" in spec:
             addsonpatch = Executable("./install/addsonpatch.sh")
